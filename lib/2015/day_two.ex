@@ -1,6 +1,6 @@
-defmodule DayTwo do
-  def partone(input) do
-    input
+defmodule AdventOfCode2015.DayTwo do
+  def partone do
+    load()
     |> String.split("\n", trim: true)
     |> Enum.map(fn dimensions ->
       # The following gives a list of [l, w, h]
@@ -15,8 +15,8 @@ defmodule DayTwo do
     |> Enum.sum()
   end
 
-  def parttwo(input) do
-    input
+  def parttwo do
+    load()
     |> String.split("\n", trim: true)
     |> Enum.map(fn dimensions ->
       # The following gives a list of [l, w, h]
@@ -35,12 +35,10 @@ defmodule DayTwo do
     end)
     |> Enum.sum()
   end
+
+  defp load do
+    File.cwd!()
+    |> Path.join("lib/2015/inputs/day_two.txt")
+    |> File.read!()
+  end
 end
-
-input =
-  File.cwd!()
-  |> Path.join("2015/inputs/day_two.txt")
-  |> File.read!()
-
-IO.puts(DayTwo.partone(input))
-IO.puts(DayTwo.parttwo(input))

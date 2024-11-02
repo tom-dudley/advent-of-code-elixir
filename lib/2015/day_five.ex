@@ -1,6 +1,6 @@
-defmodule DayFive do
-  def partone(input) do
-    input
+defmodule AdventOfCode2015.DayFive do
+  def partone do
+    load()
     |> String.split("\n", trim: true)
     |> Enum.filter(fn x ->
       vowel_count(x) >= 3 &&
@@ -10,8 +10,8 @@ defmodule DayFive do
     |> Enum.count()
   end
 
-  def parttwo(input) do
-    input
+  def parttwo do
+    load()
     |> String.split("\n", trim: true)
     |> Enum.filter(fn x ->
       has_two_non_overlapping_pairs(x) &&
@@ -158,12 +158,10 @@ defmodule DayFive do
 
     char_count(rest, chars)
   end
+
+  defp load do
+    File.cwd!()
+    |> Path.join("lib/2015/inputs/day_five.txt")
+    |> File.read!()
+  end
 end
-
-input =
-  File.cwd!()
-  |> Path.join("2015/inputs/day_five.txt")
-  |> File.read!()
-
-IO.puts(DayFive.partone(input))
-IO.puts(DayFive.parttwo(input))

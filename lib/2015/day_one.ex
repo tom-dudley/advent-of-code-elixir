@@ -1,12 +1,12 @@
-defmodule DayOne do
-  def partone(input) do
-    input
+defmodule AdventOfCode2015.DayOne do
+  def partone do
+    load()
     |> directions()
     |> Enum.sum()
   end
 
-  def parttwo(input) do
-    input
+  def parttwo do
+    load()
     |> directions()
     |> step(0, 0)
   end
@@ -30,12 +30,10 @@ defmodule DayOne do
   defp step([direction | rest], position, current_floor) do
     step(rest, position + 1, current_floor + direction)
   end
+
+  defp load do
+    File.cwd!()
+    |> Path.join("lib/2015/inputs/day_one.txt")
+    |> File.read!()
+  end
 end
-
-instructions =
-  File.cwd!()
-  |> Path.join("2015/inputs/day_one.txt")
-  |> File.read!()
-
-IO.puts(DayOne.partone(instructions))
-IO.puts(DayOne.parttwo(instructions))

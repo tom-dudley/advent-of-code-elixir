@@ -1,10 +1,13 @@
-defmodule DayThree do
-  def partone(input) do
+defmodule AdventOfCode2015.DayThree do
+  def partone do
+    input = load()
     movements = get_movements(input)
     move(movements, {0, 0}, %{}) |> map_size()
   end
 
-  def parttwo(input) do
+  def parttwo do
+    input = load()
+
     santa_movements =
       input
       |> get_movements()
@@ -50,12 +53,10 @@ defmodule DayThree do
       Map.put(visited_coords, new_pos, :visited)
     )
   end
+
+  defp load do
+    File.cwd!()
+    |> Path.join("lib/2015/inputs/day_three.txt")
+    |> File.read!()
+  end
 end
-
-input =
-  File.cwd!()
-  |> Path.join("2015/inputs/day_three.txt")
-  |> File.read!()
-
-IO.puts(DayThree.partone(input))
-IO.puts(DayThree.parttwo(input))

@@ -1,10 +1,10 @@
 # Note: This is very slow and inefficient, but does work 
-defmodule DaySix do
-  def partone(input) do
+defmodule AdventOfCode2015.DaySix do
+  def partone do
     grid = build_grid(:off)
 
     commands =
-      input
+      load()
       |> String.split("\n", trim: true)
       |> Enum.map(fn x -> parse_command(x) end)
 
@@ -13,11 +13,11 @@ defmodule DaySix do
     |> Enum.count(fn x -> x == :on end)
   end
 
-  def parttwo(input) do
+  def parttwo do
     grid = build_grid(0)
 
     commands =
-      input
+      load()
       |> String.split("\n", trim: true)
       |> Enum.map(fn x -> parse_command(x) end)
 
@@ -121,12 +121,10 @@ defmodule DaySix do
        |> List.to_tuple()
      end)}
   end
+
+  defp load do
+    File.cwd!()
+    |> Path.join("lib/2015/inputs/day_six.txt")
+    |> File.read!()
+  end
 end
-
-input =
-  File.cwd!()
-  |> Path.join("2015/inputs/day_six.txt")
-  |> File.read!()
-
-IO.puts(DaySix.partone(input))
-IO.puts(DaySix.parttwo(input))

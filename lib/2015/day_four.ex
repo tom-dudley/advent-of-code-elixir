@@ -1,12 +1,12 @@
-defmodule DayFour do
-  def partone(input) do
-    input
+defmodule AdventOfCode2015.DayFour do
+  def partone do
+    load()
     |> String.trim()
     |> calc_hash(0, "", 5)
   end
 
-  def parttwo(input) do
-    input
+  def parttwo do
+    load()
     |> String.trim()
     |> calc_hash(0, "", 6)
   end
@@ -25,12 +25,10 @@ defmodule DayFour do
         calc_hash(key, next_num, next_hash, prefix_zeroes)
     end
   end
+
+  defp load do
+    File.cwd!()
+    |> Path.join("lib/2015/inputs/day_four.txt")
+    |> File.read!()
+  end
 end
-
-input =
-  File.cwd!()
-  |> Path.join("2015/inputs/day_four.txt")
-  |> File.read!()
-
-IO.puts(DayFour.partone(input))
-IO.puts(DayFour.parttwo(input))
