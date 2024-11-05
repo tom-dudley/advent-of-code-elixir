@@ -121,12 +121,12 @@ defmodule AdventOfCode2015.DaySeven do
     IO.puts("Evaluating by id: #{id}")
 
     if Map.has_key?(evaluated, {:id, id}) do
-      Map.get(evaluated, {:id, id})
+      {Map.get(evaluated, {:id, id}), evaluated}
     else
       connection = get_input_for_output({:id, id}, connections)
       value = evaluate(connection, connections, evaluated)
       IO.puts("Storing value: #{id}")
-      new_evaluated = Map.put(evaluated, {:id, id}, value)
+      {value, Map.put(evaluated, {:id, id}, value)}
     end
   end
 

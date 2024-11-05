@@ -38,8 +38,8 @@ defmodule AdventOfCode2015.DaySevenTest do
       {{:not, {:id, "x"}}, {:id, "h"}}
     ]
 
-    assert evaluate_by_id({:id, "x"}, connections) == 123
-    assert evaluate_by_id({:id, "h"}, connections) == 65412
+    assert evaluate({:id, "x"}, connections, %{}) == {123, %{{:id, "x"} => 123}}
+    assert evaluate({:id, "h"}, connections, %{}) == {65412, %{{:id, "h"} => 65412}}
   end
 
   test "parse int" do
@@ -48,6 +48,9 @@ defmodule AdventOfCode2015.DaySevenTest do
 
   test "parse string" do
     assert parse("ab") == {:id, "ab"}
+  end
+
+  test "output to input map" do
   end
 
   test "basic example" do
@@ -66,14 +69,20 @@ defmodule AdventOfCode2015.DaySevenTest do
 
     IO.inspect(connections)
 
-    assert evaluate_by_id({:id, "d"}, connections) == 72
-    assert evaluate_by_id({:id, "e"}, connections) == 507
-    assert evaluate_by_id({:id, "f"}, connections) == 492
-    assert evaluate_by_id({:id, "g"}, connections) == 114
-    assert evaluate_by_id({:id, "x"}, connections) == 123
-    assert evaluate_by_id({:id, "y"}, connections) == 456
-    assert evaluate_by_id({:id, "h"}, connections) == 65412
-    assert evaluate_by_id({:id, "i"}, connections) == 65079
+    assert evaluate({:id, "d"}, connections, %{}) == {72, %{{:id, "d"} => 72}}
+    assert evaluate({:id, "e"}, connections, %{}) == {507, %{{:id, "e"} => 507}}
+
+    assert evaluate({:id, "f"}, connections, %{}) == {492, %{{:id, "f"} => 492}}
+
+    assert evaluate({:id, "g"}, connections, %{}) == {114, %{{:id, "g"} => 114}}
+
+    assert evaluate({:id, "x"}, connections, %{}) == {123, %{{:id, "x"} => 123}}
+
+    assert evaluate({:id, "y"}, connections, %{}) == {456, %{{:id, "y"} => 456}}
+
+    assert evaluate({:id, "h"}, connections, %{}) == {65412, %{{:id, "h"} => 65412}}
+
+    assert evaluate({:id, "i"}, connections, %{}) == {65079, %{{:id, "i"} => 65079}}
   end
 
   # test "evaluate and" do
