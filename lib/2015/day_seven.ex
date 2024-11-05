@@ -20,12 +20,12 @@ defmodule AdventOfCode2015.DaySeven do
       |> Enum.map(fn x -> parse_connection(x) end)
 
     evaluated = evaluate_outputs(connections, %{}, connections)
-    evaluated
 
-    # evaluate({:id, "a"}, connections)
+    {value, _evaluated} = evaluate({:id, "a"}, connections, evaluated)
+    value
   end
 
-  def evaluate_outputs(connections, evaluated, connections) when length(connections) == 0 do
+  def evaluate_outputs(connections, evaluated, _connections) when length(connections) == 0 do
     evaluated
   end
 
@@ -33,8 +33,8 @@ defmodule AdventOfCode2015.DaySeven do
     id = elem(connection, 1)
     id_str = elem(id, 1)
     IO.puts("Evaluating output: #{id_str}")
-    value = evaluate(id, connections, evaluated)
-    Map.put(evaluated, id, value)
+    {value, evaluated} = evaluate(id, connections, evaluated)
+    evaluated = Map.put(evaluated, id, value)
     evaluate_outputs(rest, evaluated, connections)
   end
 
@@ -111,78 +111,84 @@ defmodule AdventOfCode2015.DaySeven do
     end
   end
 
-  @spec get_input_for_output(String.t(), list(connection())) :: connection()
   def get_input_for_output(id, connections) when is_binary(id) do
-    IO.puts("Looking up by id: #{id}")
     get_input_for_output({:id, id}, connections)
   end
 
   def evaluate({:id, id}, connections, evaluated) do
-    IO.puts("Evaluating by id: #{id}")
-
     if Map.has_key?(evaluated, {:id, id}) do
       {Map.get(evaluated, {:id, id}), evaluated}
     else
       connection = get_input_for_output({:id, id}, connections)
-      value = evaluate(connection, connections, evaluated)
-      IO.puts("Storing value: #{id}")
+      IO.inspect(connection)
+      {value, evaluated} = evaluate(connection, connections, evaluated)
       {value, Map.put(evaluated, {:id, id}, value)}
     end
   end
 
-  # @spec evaluate(lshift_gate(), list(connection())) :: integer()
-  def evaluate({:lshift, l, r}, connections, evaluated) do
-    l_connection = get_input_for_output(l, connections)
-    r_connection = get_input_for_output(r, connections)
+  def evaluate(operation, connections, evaluated) do
+    if Map.has_key?(evaluated, operation) do
+      {Map.get(evaluated, operation), evaluated}
+    else
+      case operation do
+        {:lshift, l, r} ->
+          {lhs, evaluated} =
+            get_input_for_output(l, connections) |> evaluate(connections, evaluated)
 
-    Bitwise.<<<(
-      evaluate(l_connection, connections, evaluated),
-      evaluate(r_connection, connections, evaluated)
-    )
-  end
+          {rhs, evaluated} =
+            get_input_for_output(r, connections) |> evaluate(connections, evaluated)
 
-  # @spec evaluate(rshift_gate(), list(connection())) :: integer()
-  def evaluate({:rshift, l, r}, connections, evaluated) do
-    l_connection = get_input_for_output(l, connections)
-    r_connection = get_input_for_output(r, connections)
+          value = Bitwise.<<<(lhs, rhs)
+          evaluated = Map.put(evaluated, {:lshift, l, r}, value)
+          {value, evaluated}
 
-    Bitwise.>>>(
-      evaluate(l_connection, connections, evaluated),
-      evaluate(r_connection, connections, evaluated)
-    )
-  end
+        {:rshift, l, r} ->
+          {lhs, evaluated} =
+            get_input_for_output(l, connections) |> evaluate(connections, evaluated)
 
-  # @spec evaluate(and_gate(), list(connection())) :: integer()
-  def evaluate({:and, l, r}, connections, evaluated) do
-    l_connection = get_input_for_output(l, connections)
-    r_connection = get_input_for_output(r, connections)
+          {rhs, evaluated} =
+            get_input_for_output(r, connections) |> evaluate(connections, evaluated)
 
-    Bitwise.band(
-      evaluate(l_connection, connections, evaluated),
-      evaluate(r_connection, connections, evaluated)
-    )
-  end
+          value = Bitwise.>>>(lhs, rhs)
+          evaluated = Map.put(evaluated, {:rshift, l, r}, value)
+          {value, evaluated}
 
-  # @spec evaluate(or_gate(), list(connection())) :: integer()
-  def evaluate({:or, l, r}, connections, evaluated) do
-    l_connection = get_input_for_output(l, connections)
-    r_connection = get_input_for_output(r, connections)
+        {:and, l, r} ->
+          {lhs, evaluated} =
+            get_input_for_output(l, connections) |> evaluate(connections, evaluated)
 
-    Bitwise.bor(
-      evaluate(l_connection, connections, evaluated),
-      evaluate(r_connection, connections, evaluated)
-    )
-  end
+          {rhs, evaluated} =
+            get_input_for_output(r, connections) |> evaluate(connections, evaluated)
 
-  # @spec evaluate(not_gate(), list(connection())) :: integer()
-  def evaluate({:not, x}, connections, evaluated) do
-    x_connection = get_input_for_output(x, connections)
-    Bitwise.bnot(evaluate(x_connection, connections, evaluated)) &&& (1 <<< 16) - 1
-  end
+          value = Bitwise.band(lhs, rhs)
+          evaluated = Map.put(evaluated, {:and, l, r}, value)
+          {value, evaluated}
 
-  # @spec evaluate(integer_input(), list(connection())) :: integer()
-  def evaluate({:integer, x}, _connections, evaluated) do
-    x
+        {:or, l, r} ->
+          {lhs, evaluated} =
+            get_input_for_output(l, connections) |> evaluate(connections, evaluated)
+
+          {rhs, evaluated} =
+            get_input_for_output(r, connections) |> evaluate(connections, evaluated)
+
+          value = Bitwise.bor(lhs, rhs)
+          evaluated = Map.put(evaluated, {:or, l, r}, value)
+          {value, evaluated}
+
+        {:not, x} ->
+          {rhs, evaluated} =
+            get_input_for_output(x, connections) |> evaluate(connections, evaluated)
+
+          value = Bitwise.bnot(rhs) &&& (1 <<< 16) - 1
+          evaluated = Map.put(evaluated, {:not, x}, value)
+          {value, evaluated}
+
+        {:integer, x} ->
+          value = x
+          evaluated = Map.put(evaluated, {:integer, x}, value)
+          {value, evaluated}
+      end
+    end
   end
 
   def load do

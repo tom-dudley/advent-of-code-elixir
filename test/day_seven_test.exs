@@ -69,28 +69,70 @@ defmodule AdventOfCode2015.DaySevenTest do
 
     IO.inspect(connections)
 
-    assert evaluate({:id, "d"}, connections, %{}) == {72, %{{:id, "d"} => 72}}
-    assert evaluate({:id, "e"}, connections, %{}) == {507, %{{:id, "e"} => 507}}
+    assert evaluate({:id, "d"}, connections, %{}) ==
+             {72,
+              %{
+                {:id, "d"} => 72,
+                {:integer, 123} => 123,
+                {:integer, 456} => 456,
+                {:and, {:id, "x"}, {:id, "y"}} => 72
+              }}
 
-    assert evaluate({:id, "f"}, connections, %{}) == {492, %{{:id, "f"} => 492}}
+    assert evaluate({:id, "e"}, connections, %{}) ==
+             {507,
+              %{
+                {:id, "e"} => 507,
+                {:integer, 123} => 123,
+                {:integer, 456} => 456,
+                {:or, {:id, "x"}, {:id, "y"}} => 507
+              }}
 
-    assert evaluate({:id, "g"}, connections, %{}) == {114, %{{:id, "g"} => 114}}
+    assert evaluate({:id, "f"}, connections, %{}) ==
+             {492,
+              %{
+                {:id, "f"} => 492,
+                {:integer, 2} => 2,
+                {:integer, 123} => 123,
+                {:lshift, {:id, "x"}, {:integer, 2}} => 492
+              }}
 
-    assert evaluate({:id, "x"}, connections, %{}) == {123, %{{:id, "x"} => 123}}
+    assert evaluate({:id, "g"}, connections, %{}) ==
+             {114,
+              %{
+                {:id, "g"} => 114,
+                {:integer, 2} => 2,
+                {:integer, 456} => 456,
+                {:rshift, {:id, "y"}, {:integer, 2}} => 114
+              }}
 
-    assert evaluate({:id, "y"}, connections, %{}) == {456, %{{:id, "y"} => 456}}
+    assert evaluate({:id, "x"}, connections, %{}) ==
+             {123,
+              %{
+                {:id, "x"} => 123,
+                {:integer, 123} => 123
+              }}
 
-    assert evaluate({:id, "h"}, connections, %{}) == {65412, %{{:id, "h"} => 65412}}
+    assert evaluate({:id, "y"}, connections, %{}) ==
+             {456,
+              %{
+                {:id, "y"} => 456,
+                {:integer, 456} => 456
+              }}
 
-    assert evaluate({:id, "i"}, connections, %{}) == {65079, %{{:id, "i"} => 65079}}
+    assert evaluate({:id, "h"}, connections, %{}) ==
+             {65412,
+              %{
+                {:id, "h"} => 65412,
+                {:not, {:id, "x"}} => 65412,
+                {:integer, 123} => 123
+              }}
+
+    assert evaluate({:id, "i"}, connections, %{}) ==
+             {65079,
+              %{
+                {:id, "i"} => 65079,
+                {:not, {:id, "y"}} => 65079,
+                {:integer, 456} => 456
+              }}
   end
-
-  # test "evaluate and" do
-  #   connections = [
-  #     {{:integer, 12}, "a"},
-  #     {{:integer, 15}, "b"},
-  #     {{:integer, 15}, "b"},
-  #   ]
-  #   assert evaluate({:and, 12, 25}, []) == Bitwise.band(12, 25)
-  # end
 end
