@@ -1,18 +1,6 @@
 import Bitwise
 
 defmodule AdventOfCode2015.DaySeven do
-  @type integer_input() :: {:integer, integer()}
-  @type wire() :: {:id, String.t()}
-  @type lshift_gate() :: {:lshift, integer(), integer()}
-  @type rshift_gate() :: {:rshift, integer(), integer()}
-  @type and_gate() :: {:and, integer(), integer()}
-  @type or_gate() :: {:or, integer(), integer()}
-  @type not_gate() :: {:not, integer()}
-  @type gate() :: lshift_gate() | rshift_gate() | and_gate() | or_gate() | not_gate()
-  @type id() :: {:id, String.t()}
-  @type connection() :: {integer_input() | wire() | gate(), id()}
-
-  # @spec partone() :: integer()
   def partone do
     connections =
       load()
@@ -21,8 +9,29 @@ defmodule AdventOfCode2015.DaySeven do
 
     evaluated = evaluate_outputs(connections, %{}, connections)
 
-    {value, _evaluated} = evaluate({:id, "a"}, connections, evaluated)
-    value
+    {wire_a, _evaluated} = evaluate({:id, "a"}, connections, evaluated)
+    wire_a
+  end
+
+  def parttwo do
+    connections =
+      load()
+      |> String.split("\n", trim: true)
+      |> Enum.map(fn x -> parse_connection(x) end)
+
+    evaluated = evaluate_outputs(connections, %{}, connections)
+
+    {wire_a, _evaluated} = evaluate({:id, "a"}, connections, evaluated)
+
+    connections =
+      connections |> Enum.filter(fn connection -> elem(connection, 1) != {:id, "b"} end)
+
+    connections = [{{:integer, wire_a}, {:id, "b"}} | connections]
+
+    evaluated = evaluate_outputs(connections, %{}, connections)
+
+    {wire_a, _evaluated} = evaluate({:id, "a"}, connections, evaluated)
+    wire_a
   end
 
   def evaluate_outputs(connections, evaluated, _connections) when length(connections) == 0 do
@@ -31,14 +40,11 @@ defmodule AdventOfCode2015.DaySeven do
 
   def evaluate_outputs([connection | rest], evaluated, connections) do
     id = elem(connection, 1)
-    id_str = elem(id, 1)
-    IO.puts("Evaluating output: #{id_str}")
     {value, evaluated} = evaluate(id, connections, evaluated)
     evaluated = Map.put(evaluated, id, value)
     evaluate_outputs(rest, evaluated, connections)
   end
 
-  # @spec parse_connection(String.t()) :: connection()
   def parse_connection(s) do
     [input, output] = String.split(s, " -> ")
 
@@ -84,16 +90,11 @@ defmodule AdventOfCode2015.DaySeven do
     end
   end
 
-  # get_input_for_output gets the input into a given provided output 
-  @spec get_input_for_output(integer_input(), list(connection())) :: connection()
   def get_input_for_output({:integer, i}, _connections) do
     {:integer, i}
   end
 
-  @spec get_input_for_output(id(), list(connection())) :: connection()
   def get_input_for_output({:id, id}, connections) do
-    IO.puts("Looking up id: #{id}")
-
     case Enum.filter(
            connections,
            fn x ->
@@ -120,7 +121,6 @@ defmodule AdventOfCode2015.DaySeven do
       {Map.get(evaluated, {:id, id}), evaluated}
     else
       connection = get_input_for_output({:id, id}, connections)
-      IO.inspect(connection)
       {value, evaluated} = evaluate(connection, connections, evaluated)
       {value, Map.put(evaluated, {:id, id}, value)}
     end
