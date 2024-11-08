@@ -12,6 +12,19 @@ defmodule AdventOfCode2015.DayNine do
     |> Enum.min()
   end
 
+  def parttwo() do
+    {distances, locations} =
+      load()
+      |> String.split("\n", trim: true)
+      |> parse_distances(%{}, [])
+
+    routes = combinations(locations)
+
+    routes
+    |> Enum.map(fn x -> get_route_distance(x, distances) |> Enum.sum() end)
+    |> Enum.max()
+  end
+
   def get_route_distance(route, distances) do
     0..(length(route) - 2)
     |> Enum.map(fn x ->
